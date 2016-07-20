@@ -9,6 +9,13 @@ module Oracle
         granted_roles.include?(role)
       end
 
+      has_many :roles, class_name: '::Oracle::Dba::RolePriv', primary_key: :username,
+                       foreign_key: :grantee
+
+      scope :real, lambda {
+        where("REGEXP_LIKE(username, '^[A-Z]{2}[0-9]+')")
+      }
+
       def granted_roles
         @granted_roles ||= ::RedmineOracle::Connection.map(<<EOS
 SELECT GRANTED_ROLE
