@@ -1,0 +1,19 @@
+<h4>Colunas</h4>
+<table class="list columns">
+  <thead>
+    <tr>
+      <th style="text-align: left; width: 50%">Name</th>
+      <th style="width: 30%">Type</th>
+      <th style="width: 20%">Nullable</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% table.columns.each do |c|  %>
+      <tr class="<%= cycle("odd", "even") %>">
+        <td style="text-align: left"><%= c.column_name %></td>
+        <td><%= c.data_type %></td>
+        <td><%= c.nullable %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>

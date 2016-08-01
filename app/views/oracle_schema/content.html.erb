@@ -1,0 +1,4 @@
+<p><label>Total de tabelas: </label><%= @tables.count %></p>
+<% @tables.each do |table| %>
+  <%= render partial: 'table', locals: {table: table} %>
+<% end %>

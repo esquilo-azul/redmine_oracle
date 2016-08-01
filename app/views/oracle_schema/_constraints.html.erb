@@ -1,0 +1,50 @@
+<h4>Chaves</h4>
+<% if table.constraints.empty? %>
+  <p><em>Não possui chaves</em></p>
+<% else %>
+  <table class="list constraints">
+    <thead>
+      <tr>
+        <th>Tipo</th>
+        <th>Nome</th>
+        <th>Colunas</th>
+        <th>Inversa</th>
+        <th>Tabela inversa</th>
+        <th>Colunas da inversa</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% table.constraints.each do |c|  %>
+        <tr class="<%= cycle("odd", "even") %>">
+          <td>
+            <%= oracle_constraint_anchor(c) %>
+            <%= c.constraint_type %>
+          </td>
+          <td><%= c.constraint_name %></td>
+          <td><%= c.columns_names.join(', ') %></td>
+          <td>
+            <% if c.reverse %>
+              <%= oracle_constraint_link(c.reverse) %>
+            <% else %>
+              <em>-</em>
+            <% end %>
+          </td>
+          <td>
+            <% if c.reverse %>
+              <%= oracle_table_link(c.reverse.table) %>
+            <% else %>
+              <em>-</em>
+            <% end %>
+          </td>
+          <td>
+            <% if c.reverse  %>
+              <%= c.reverse.columns_names.join(', ') %>
+            <% else %>
+              <em>-</em>
+            <% end %>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+<% end %>

@@ -1,0 +1,29 @@
+<h4>Chaves inversas</h4>
+<% if table.reverse_constraints.empty? %>
+  <p><em>Não possui chaves inversas</em></p>
+<% else %>
+  <table class="list constraints">
+    <thead>
+      <tr>
+        <th>Tipo</th>
+        <th>Tabela</th>
+        <th>Nome</th>
+        <th>Colunas</th>
+        <th>Chave local</th>
+        <th>Colunas locais</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% table.reverse_constraints.each do |c|  %>
+        <tr class="<%= cycle("odd", "even") %>">
+          <td><%= c.constraint_type %></td>
+          <td><%= oracle_table_link(c.table) %></td>
+          <td><%= oracle_constraint_link(c) %></td>
+          <td><%= c.columns_names.join(', ') %></td>
+          <td><%= oracle_constraint_link(c.reverse) %></td>
+          <td><%= c.reverse.columns_names.join(', ') %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+<% end %>

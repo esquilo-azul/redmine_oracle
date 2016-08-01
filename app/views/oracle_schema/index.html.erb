@@ -1,0 +1,10 @@
+<h2><%= t(:label_oracle_schema) %></h2>
+<%= render partial: 'styles' %>
+<% if @cache_time.present? && @content.present? %>
+  <p>Data/hora da criação do esquema: <%= "#{@cache_time}" %>. Acione <strong>Gerar esquema</strong> para gerar um novo.</p>
+  <%= render partial: 'generate_form' %>
+  <%= raw(@content) %>
+<% else %>
+  <p>Não há um esquema previamente gerado. Acione <strong>Gerar esquema</strong> para gerar um.</p>
+  <%= render partial: 'generate_form' %>
+<% end %>

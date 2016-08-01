@@ -1,0 +1,7 @@
+<div class="table">
+  <%= oracle_table_anchor(table) %>
+  <h3><%= table %></h3>
+  <%= render partial: 'columns', locals: {table: table} %>
+  <%= render partial: 'constraints', locals: {table: table} %>
+  <%= render partial: 'reverse_constraints', locals: {table: table} %>
+</div>
