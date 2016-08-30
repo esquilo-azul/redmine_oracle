@@ -1,6 +1,6 @@
 module Oracle
   module Dba
-    class Constraint < Sjap::Oracle::BaseModel
+    class Constraint < ::RedmineOracle::BaseModel
       self.table_name = 'dba_constraints'
 
       def to_s

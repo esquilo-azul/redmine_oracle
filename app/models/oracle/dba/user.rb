@@ -2,7 +2,7 @@ require 'sjap/oracle'
 
 module Oracle
   module Dba
-    class User < Sjap::Oracle::BaseModel
+    class User < ::RedmineOracle::BaseModel
       self.table_name = 'dba_users'
 
       def granted_role?(role)

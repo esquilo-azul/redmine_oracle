@@ -1,6 +1,6 @@
 module Oracle
   module Dba
-    class Table < Sjap::Oracle::BaseModel
+    class Table < ::RedmineOracle::BaseModel
       self.table_name = 'dba_tables'
 
       def to_s
