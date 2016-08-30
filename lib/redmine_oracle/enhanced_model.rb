@@ -5,16 +5,16 @@ module RedmineOracle
     end
 
     module ClassMethods
-      def oracle_belongs_to(name, class_name, constraint_name, options = {})
-        associations[name] = BelongsToAssociation.new(self, class_name, constraint_name, options)
+      def oracle_belongs_to(name, class_name, options = {})
+        associations[name] = BelongsToAssociation.new(self, class_name, options)
       end
 
-      def oracle_has_many(name, class_name, constraint_name, options = {})
-        associations[name] = HasManyAssociation.new(self, class_name, constraint_name, options)
+      def oracle_has_many(name, class_name, options = {})
+        associations[name] = HasManyAssociation.new(self, class_name, options)
       end
 
-      def oracle_has_one(name, class_name, constraint_name, options = {})
-        associations[name] = HasOneAssociation.new(self, class_name, constraint_name, options)
+      def oracle_has_one(name, class_name, options = {})
+        associations[name] = HasOneAssociation.new(self, class_name, options)
       end
 
       def find_association(name)

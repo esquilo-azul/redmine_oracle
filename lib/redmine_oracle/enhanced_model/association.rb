@@ -1,11 +1,10 @@
 module RedmineOracle
   module EnhancedModel
     class Association
-      def initialize(source_class, class_name, constraint_name, options)
+      def initialize(source_class, class_name, options = {})
         @source_class = source_class
         @target_class_name = class_name
-        @constraint_name = constraint_name
-        @options = options
+        @options = ActiveSupport::HashWithIndifferentAccess.new(options)
       end
 
       protected
@@ -21,8 +20,7 @@ module RedmineOracle
       end
 
       def to_s
-        "Source: #{@source_class.name}, Target name: #{@target_class_name}, " \
-          "Constraint: #{@constraint_name}"
+        "Source: #{@source_class.name}, Target name: #{@target_class_name}"
       end
 
       private
@@ -45,21 +43,15 @@ module RedmineOracle
 
       def source_columns
         @source_columns ||= begin
-          if foreign_key_in_source?
-            constraint.columns_names
-          else
-            constraint.reverse.columns_names
-          end.map(&:downcase)
+          return by_constraint_source_columns if constraint.present?
+          fail 'No source columns provided'
         end
       end
 
       def target_columns
         @target_columns ||= begin
-          if foreign_key_in_source?
-            constraint.reverse.columns_names
-          else
-            constraint.columns_names
-          end.map(&:downcase)
+          return by_constraint_target_columns if constraint.present?
+          fail 'No target columns provided'
         end
       end
 
@@ -101,12 +93,29 @@ module RedmineOracle
 
       def constraint
         @constraint ||= begin
+          return nil unless @options[:constraint_name].present?
           c = ::Oracle::Dba::Constraint.where(owner: foreign_key_class.table.owner,
-                                              constraint_name: @constraint_name).first
+                                              constraint_name: @options[:constraint_name]).first
           return c if c
           fail "Constraint not found: owner: \"#{foreign_key_class.table.owner}\", " \
-            "name: \"#{@constraint_name}\""
+            "name: \"#{@options[:constraint_name]}\""
         end
+      end
+
+      def by_constraint_source_columns
+        if foreign_key_in_source?
+          constraint.columns_names
+        else
+          constraint.reverse.columns_names
+        end.map(&:downcase)
+      end
+
+      def by_constraint_target_columns
+        if foreign_key_in_source?
+          constraint.reverse.columns_names
+        else
+          constraint.columns_names
+        end.map(&:downcase)
       end
     end
   end
