@@ -1,4 +1,4 @@
-require 'sjap/oracle'
+require 'redmine_oracle/connection'
 
 module RedmineOracle
   class SearchValues
@@ -49,7 +49,7 @@ module RedmineOracle
     end
 
     def search_column_count(table_fullname, column_name, value)
-      ::Sjap::Oracle.query_unique_value(<<EOS)
+      ::RedmineOracle::Connection.query_unique_value(<<EOS)
 select count(#{column_name})
 from #{table_fullname}
 where #{column_name} = #{value}
