@@ -1,6 +1,8 @@
 module RedmineOracle
   module EnhancedModel
     class Association
+      include ::RedmineOracle::EnhancedModel::Association::ByConstraint
+
       def initialize(source_class, class_name, options = {})
         @source_class = source_class
         @target_class_name = class_name
@@ -44,6 +46,7 @@ module RedmineOracle
       def source_columns
         @source_columns ||= begin
           return by_constraint_source_columns if constraint.present?
+          return provided_source_columns if provided_source_columns.present?
           fail 'No source columns provided'
         end
       end
@@ -51,21 +54,13 @@ module RedmineOracle
       def target_columns
         @target_columns ||= begin
           return by_constraint_target_columns if constraint.present?
+          return by_primary_key_target_columns if provided_source_columns.present?
           fail 'No target columns provided'
         end
       end
 
       def foreign_key_class
         foreign_key_in_source? ? @source_class : target_class
-      end
-
-      def check_foreign_key
-        return if @foreign_key_checked
-        check_constraint_type
-        check_constraint_owner
-        check_columns(@source_class, source_columns)
-        check_columns(target_class, target_columns)
-        @foreign_key_checked = true
       end
 
       def check_columns(klass, columns)
@@ -76,46 +71,18 @@ module RedmineOracle
         end
       end
 
-      def check_constraint_type
-        fail "Nenhuma coluna encontrada para #{constraint}" if constraint.columns.empty?
-        fail "\"#{constraint}\" não é chave estrangeira" unless constraint.constraint_type == 'R'
-      end
-
-      def check_constraint_owner
-        return if constraint.table == foreign_key_class.table
-        fail "Constraint: #{constraint}, Foreign Key Class Table: " \
-          "#{foreign_key_class.table}, Constraint Table: #{constraint.table}"
-      end
-
       def target_class
         @target_class ||= @target_class_name.constantize
       end
 
-      def constraint
-        @constraint ||= begin
-          return nil unless @options[:constraint_name].present?
-          c = ::Oracle::Dba::Constraint.where(owner: foreign_key_class.table.owner,
-                                              constraint_name: @options[:constraint_name]).first
-          return c if c
-          fail "Constraint not found: owner: \"#{foreign_key_class.table.owner}\", " \
-            "name: \"#{@options[:constraint_name]}\""
-        end
+      def provided_source_columns
+        return nil unless @options[:source_columns].present?
+        return [@options[:source_columns]] unless @options[:source_columns].is_a?(Array)
+        @options[:source_columns]
       end
 
-      def by_constraint_source_columns
-        if foreign_key_in_source?
-          constraint.columns_names
-        else
-          constraint.reverse.columns_names
-        end.map(&:downcase)
-      end
-
-      def by_constraint_target_columns
-        if foreign_key_in_source?
-          constraint.reverse.columns_names
-        else
-          constraint.columns_names
-        end.map(&:downcase)
+      def by_primary_key_target_columns
+        target_class.pk_constraint.columns_names.map(&:underscore)
       end
     end
   end

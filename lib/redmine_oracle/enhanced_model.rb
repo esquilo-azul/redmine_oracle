@@ -26,6 +26,13 @@ module RedmineOracle
                                               table_name: table_name_parts[1]).first
       end
 
+      def pk_constraint
+        c = ::Oracle::Dba::Constraint.where(owner: table.owner, table_name: table.table_name,
+                                            constraint_type: 'P').first
+        return c if c
+        "\"#{table}\" has no primary key constraint"
+      end
+
       private
 
       def table_name_parts
