@@ -2,11 +2,30 @@ module RedmineOracle
   module EnhancedModel
     class Association
       include ::RedmineOracle::EnhancedModel::Association::ByConstraint
+      include ::RedmineOracle::EnhancedModel::Association::ByInverse
 
       def initialize(source_class, class_name, options = {})
         @source_class = source_class
         @target_class_name = class_name
         @options = ActiveSupport::HashWithIndifferentAccess.new(options)
+      end
+
+      def source_columns
+        @source_columns ||= begin
+          return by_inverse_source_columns if inverse.present?
+          return by_constraint_source_columns if constraint.present?
+          return provided_source_columns if provided_source_columns.present?
+          fail 'No source columns provided'
+        end
+      end
+
+      def target_columns
+        @target_columns_cached ||= begin
+          return by_inverse_target_columns if inverse.present?
+          return by_constraint_target_columns if constraint.present?
+          return by_primary_key_target_columns if provided_source_columns.present?
+          fail 'No target columns provided'
+        end
       end
 
       protected
@@ -41,22 +60,6 @@ module RedmineOracle
 
       def instance_has_source_column_values(instance)
         source_columns.all? { |c| instance[c].present? }
-      end
-
-      def source_columns
-        @source_columns ||= begin
-          return by_constraint_source_columns if constraint.present?
-          return provided_source_columns if provided_source_columns.present?
-          fail 'No source columns provided'
-        end
-      end
-
-      def target_columns
-        @target_columns ||= begin
-          return by_constraint_target_columns if constraint.present?
-          return by_primary_key_target_columns if provided_source_columns.present?
-          fail 'No target columns provided'
-        end
       end
 
       def foreign_key_class
