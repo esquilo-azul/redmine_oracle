@@ -52,7 +52,9 @@ module RedmineOracle
 
     def method_missing(name, *args, &block)
       assoc = self.class.find_association(name)
-      assoc ? assoc.instance_value(self) : super
+      return super unless assoc
+      @assoc_cache ||= ActiveSupport::HashWithIndifferentAccess.new
+      @assoc_cache[name] ||= assoc.instance_value(self)
     end
 
     def respond_to_missing?(name, include_private = false)
