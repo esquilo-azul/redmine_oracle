@@ -1,5 +1,5 @@
 class OracleSchemaController < ApplicationController
-  layout 'trf1_sjap'
+  layout 'sjap'
   require_permission 'oracle_schema_read'
 
   def index
