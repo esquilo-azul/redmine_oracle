@@ -13,5 +13,9 @@ module RedmineOracle
       end
       attrs.to_h.to_yaml
     end
+
+    def self.parse_data_import_key(key)
+      YAML.load(key)
+    end
   end
 end
