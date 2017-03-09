@@ -6,6 +6,7 @@ module RedmineOracle
 
     self.abstract_class = true
 
+    # Models com chaves primárias de um único campo sobreescrevem este método.
     def id
       attrs = self.class.pk_constraint.columns_names.sort.map do |c|
         attr = c.downcase.to_sym
@@ -15,7 +16,11 @@ module RedmineOracle
     end
 
     def self.parse_id(key)
-      YAML.load(key)
+      if primary_key.present?
+        { primary_key => key }.with_indifferent_access
+      else
+        YAML.load(key)
+      end
     end
   end
 end
