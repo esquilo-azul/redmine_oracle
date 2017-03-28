@@ -34,6 +34,18 @@ module Oracle
         username
       end
 
+      def grant_role(role_name)
+        s = "grant \"#{role_name}\" to \"#{username}\""
+        Rails.logger.debug(s)
+        self.class.connection.execute(s)
+      end
+
+      def revoke_role(role_name)
+        s = "revoke \"#{role_name}\" from \"#{username}\""
+        Rails.logger.debug(s)
+        self.class.connection.execute(s)
+      end
+
       def granted_roles
         ::RedmineOracle::Connection.map(<<EOS) do |row|
 SELECT GRANTED_ROLE
