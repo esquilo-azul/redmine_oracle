@@ -5,6 +5,12 @@ module Oracle
     class User < ::RedmineOracle::BaseModel
       self.table_name = 'dba_users'
 
+      class << self
+        def find_by_login(login)
+          where('lower(username) = lower(?)', login).first
+        end
+      end
+
       def granted_role?(role)
         granted_roles.include?(role)
       end
@@ -25,6 +31,10 @@ EOS
                                                           ) do |row|
           row[0]
         end
+      end
+
+      def password_match?(pwd)
+        ::RedmineOracle::UserPasswordMatch.authenticate(username, pwd)
       end
     end
   end
