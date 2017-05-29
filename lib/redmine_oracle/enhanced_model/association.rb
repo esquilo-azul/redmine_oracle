@@ -23,6 +23,7 @@ module RedmineOracle
         @target_columns_cached ||= begin
           return by_inverse_target_columns if inverse.present?
           return by_constraint_target_columns if constraint.present?
+          return provided_target_columns if provided_target_columns.present?
           return by_primary_key_target_columns if provided_source_columns.present?
           fail 'No target columns provided'
         end
@@ -79,9 +80,17 @@ module RedmineOracle
       end
 
       def provided_source_columns
-        return nil unless @options[:source_columns].present?
-        return [@options[:source_columns]] unless @options[:source_columns].is_a?(Array)
-        @options[:source_columns]
+        provided_columns(:source_columns)
+      end
+
+      def provided_target_columns
+        provided_columns(:target_columns)
+      end
+
+      def provided_columns(key)
+        return nil unless @options[key].present?
+        return [@options[key]] unless @options[key].is_a?(Array)
+        @options[key]
       end
 
       def by_primary_key_target_columns
