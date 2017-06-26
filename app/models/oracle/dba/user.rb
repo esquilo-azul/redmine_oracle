@@ -6,6 +6,10 @@ module Oracle
       self.table_name = 'dba_users'
 
       class << self
+        def find(id)
+          find_by_login(id)
+        end
+
         def find_by_login(login)
           where('lower(username) = lower(?)', login).first
         end
@@ -22,13 +26,20 @@ module Oracle
         where("REGEXP_LIKE(username, '^[A-Z]{2}[0-9]+')")
       }
 
+      def to_s
+        username
+      end
+
+      def id
+        username
+      end
+
       def granted_roles
-        @granted_roles ||= ::RedmineOracle::Connection.map(<<EOS
+        ::RedmineOracle::Connection.map(<<EOS) do |row|
 SELECT GRANTED_ROLE
 FROM DBA_ROLE_PRIVS
 WHERE lower(grantee) = lower('#{username}')
 EOS
-                                                          ) do |row|
           row[0]
         end
       end
