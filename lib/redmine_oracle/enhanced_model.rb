@@ -8,6 +8,9 @@ module RedmineOracle
       def oracle_belongs_to(name, class_name, options = {})
         associations[name] = BelongsToAssociation.new(self, class_name, options)
         define_instance_read_method(name)
+        define_singleton_method("where_#{name}") do |target_instance|
+          associations[name].where_by_target(target_instance)
+        end
       end
 
       def oracle_has_many(name, class_name, options = {})

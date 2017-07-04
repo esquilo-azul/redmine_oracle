@@ -31,6 +31,8 @@ module RedmineOracle
 
       protected
 
+      attr_reader :source_class
+
       def target_query_relation(source_instance)
         check_foreign_key
         return target_class.none unless instance_has_source_column_values(source_instance)
@@ -39,6 +41,16 @@ module RedmineOracle
           q = q.where(c => source_instance[source_columns[i]])
         end
         order_query(q)
+      end
+
+      def source_query_relation(target_instance)
+        check_foreign_key
+        return source_class.none unless instance_has_target_column_values(target_instance)
+        q = source_class.all
+        source_columns.each_with_index do |c, i|
+          q = q.where(c => target_instance[target_columns[i]])
+        end
+        q
       end
 
       def to_s
@@ -61,6 +73,10 @@ module RedmineOracle
 
       def instance_has_source_column_values(instance)
         source_columns.all? { |c| instance[c].present? }
+      end
+
+      def instance_has_target_column_values(instance)
+        target_columns.all? { |c| instance[c].present? }
       end
 
       def foreign_key_class
