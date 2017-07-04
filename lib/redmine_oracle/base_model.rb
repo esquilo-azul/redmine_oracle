@@ -44,5 +44,12 @@ module RedmineOracle
         YAML.load(key)
       end
     end
+
+    def relation_for_destroy
+      d = Hash[self.class.pk_columns.map { |c| [c, self[c]] }]
+      r = self.class.where(d)
+      return r if r.count <= 1
+      fail "Relation for destroy count is greater then 1 (Count: #{r.count}, Data: #{d})"
+    end
   end
 end
