@@ -8,6 +8,7 @@ module RedmineOracle
       def oracle_belongs_to(name, class_name, options = {})
         associations[name] = BelongsToAssociation.new(self, class_name, options)
         define_instance_read_method(name)
+        define_instance_write_method(name)
         define_singleton_method("where_#{name}") do |target_instance|
           associations[name].where_by_target(target_instance)
         end
@@ -61,6 +62,15 @@ module RedmineOracle
           return super unless assoc
           @assoc_cache ||= ActiveSupport::HashWithIndifferentAccess.new
           @assoc_cache[assoc_name] ||= assoc.instance_value_read(self)
+        end
+      end
+
+      def define_instance_write_method(assoc_name)
+        define_method("#{assoc_name}=") do |value|
+          assoc = self.class.find_association(assoc_name)
+          return super unless assoc
+          @assoc_cache ||= ActiveSupport::HashWithIndifferentAccess.new
+          @assoc_cache[assoc_name] ||= assoc.instance_value_write(self, value)
         end
       end
     end
