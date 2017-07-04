@@ -1,8 +1,8 @@
 module RedmineOracle
   module EnhancedModel
     class HasManyAssociation < Association
-      def instance_value(instance)
-        query_relation(instance)
+      def instance_value_read(instance)
+        target_query_relation(instance)
       end
 
       private

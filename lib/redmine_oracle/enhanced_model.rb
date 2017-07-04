@@ -7,14 +7,17 @@ module RedmineOracle
     module ClassMethods
       def oracle_belongs_to(name, class_name, options = {})
         associations[name] = BelongsToAssociation.new(self, class_name, options)
+        define_instance_read_method(name)
       end
 
       def oracle_has_many(name, class_name, options = {})
         associations[name] = HasManyAssociation.new(self, class_name, options)
+        define_instance_read_method(name)
       end
 
       def oracle_has_one(name, class_name, options = {})
         associations[name] = HasOneAssociation.new(self, class_name, options)
+        define_instance_read_method(name)
       end
 
       def find_association(name)
@@ -48,17 +51,15 @@ module RedmineOracle
       def associations
         @associations ||= ActiveSupport::HashWithIndifferentAccess.new
       end
-    end
 
-    def method_missing(name, *args, &block)
-      assoc = self.class.find_association(name)
-      return super unless assoc
-      @assoc_cache ||= ActiveSupport::HashWithIndifferentAccess.new
-      @assoc_cache[name] ||= assoc.instance_value(self)
-    end
-
-    def respond_to_missing?(name, include_private = false)
-      self.class.find_association(name) ? true : super
+      def define_instance_read_method(assoc_name)
+        define_method(assoc_name) do
+          assoc = self.class.find_association(assoc_name)
+          return super unless assoc
+          @assoc_cache ||= ActiveSupport::HashWithIndifferentAccess.new
+          @assoc_cache[assoc_name] ||= assoc.instance_value_read(self)
+        end
+      end
     end
   end
 end

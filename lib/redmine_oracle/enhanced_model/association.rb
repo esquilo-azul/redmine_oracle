@@ -31,12 +31,12 @@ module RedmineOracle
 
       protected
 
-      def query_relation(instance)
+      def target_query_relation(source_instance)
         check_foreign_key
-        return target_class.none unless instance_has_source_column_values(instance)
+        return target_class.none unless instance_has_source_column_values(source_instance)
         q = target_class.all
         target_columns.each_with_index do |c, i|
-          q = q.where(c => instance[source_columns[i]])
+          q = q.where(c => source_instance[source_columns[i]])
         end
         order_query(q)
       end
