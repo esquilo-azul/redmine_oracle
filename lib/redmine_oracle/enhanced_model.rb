@@ -70,7 +70,7 @@ module RedmineOracle
           assoc = self.class.find_association(assoc_name)
           return super unless assoc
           @assoc_cache ||= ActiveSupport::HashWithIndifferentAccess.new
-          @assoc_cache[assoc_name] ||= assoc.instance_value_write(self, value)
+          @assoc_cache[assoc_name] = assoc.instance_value_write(self, value)
         end
       end
     end
