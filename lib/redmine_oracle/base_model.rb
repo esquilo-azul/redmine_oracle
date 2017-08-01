@@ -18,6 +18,12 @@ module RedmineOracle
         pk_constraint.columns_names.sort.map { |c| c.downcase.to_sym }
       end
 
+      def with_default_transaction(&block)
+        ActiveRecord::Base.transaction do
+          on_oracle_database_transaction(&block)
+        end
+      end
+
       private
 
       def find_by_pk_columns(attrs)
@@ -28,6 +34,19 @@ module RedmineOracle
           q = q.where(c => attrs[c])
         end
         q.first
+      end
+
+      def on_oracle_database_transaction(&block)
+        rollback = nil
+        transaction do
+          begin
+            block.call
+          rescue ActiveRecord::Rollback => ex
+            rollback = ex
+            raise ActiveRecord::Rollback
+          end
+        end
+        fail rollback if rollback
       end
     end
 
