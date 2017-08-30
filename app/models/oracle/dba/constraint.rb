@@ -1,7 +1,7 @@
 module Oracle
   module Dba
     class Constraint < ::RedmineOracle::BaseModel
-      self.table_name = 'dba_constraints'
+      self.table_name = 'all_constraints'
 
       def to_s
         [owner, constraint_name].join('.')

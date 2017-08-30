@@ -3,7 +3,7 @@ require 'redmine_oracle/connection'
 module Oracle
   module Dba
     class User < ::RedmineOracle::BaseModel
-      self.table_name = 'dba_users'
+      self.table_name = 'all_users'
 
       class << self
         def find(id)

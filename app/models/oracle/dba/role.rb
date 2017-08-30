@@ -1,7 +1,7 @@
 module Oracle
   module Dba
     class Role < ::RedmineOracle::BaseModel
-      self.table_name = 'dba_roles'
+      self.table_name = 'all_roles'
 
       def self.names
         all.pluck(:role)

@@ -1,7 +1,7 @@
 module Oracle
   module Dba
     class Table < ::RedmineOracle::BaseModel
-      self.table_name = 'dba_tables'
+      self.table_name = 'all_tables'
 
       def to_s
         [owner, table_name].join('.')
