@@ -19,7 +19,11 @@ module Oracle
       def reverse
         @reverse ||= begin
           return nil unless r_constraint_name
-          ::Oracle::Dba::Constraint.where(owner: r_owner, constraint_name: r_constraint_name).first
+          r = ::Oracle::Dba::Constraint.where(owner: r_owner,
+                                              constraint_name: r_constraint_name).first
+          return r if r
+          fail "Reverse constraint not found for #{self}" \
+            "(Owner: \"#{r_owner}\", Name: \"#{r_constraint_name}\""
         end
       end
 
