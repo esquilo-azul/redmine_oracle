@@ -47,13 +47,7 @@ module Oracle
       end
 
       def granted_roles
-        ::RedmineOracle::Connection.map(<<EOS) do |row|
-SELECT GRANTED_ROLE
-FROM DBA_ROLE_PRIVS
-WHERE lower(grantee) = lower('#{username}')
-EOS
-          row[0]
-        end
+        roles.pluck(:granted_role)
       end
 
       def password_match?(pwd)
